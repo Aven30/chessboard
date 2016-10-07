@@ -112,5 +112,6 @@ while(turn < 10):
             pass
         else:
             break
+    player1.write(turn,piece,move)
     turn = turn + 2
 print("X Finished")  
