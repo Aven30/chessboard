@@ -1,7 +1,6 @@
 import collections
 import copy
 import chess
-from collections import OrderedDict
 from treelib import Node, Tree
 
 def miniMaxTree(board):
