@@ -37,8 +37,7 @@ def miniMaxTree(board):
 				else:
 					boardName = parentNodeName+'_'+str(index);
 				 
-				val = heuristicY.h(brd)
-				heuristicValues[boardName] = val			
+				val = heuristicY.h(brd)			
 				tree.create_node(nodeName+'_'+str(i2),nodeName+'_'+str(i2),parent=boardName,data=brd)
 				i2 = i2+1
 			index = index+1
