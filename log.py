@@ -35,7 +35,7 @@ class FileHandler:
         file = "log_"+self.__player+".txt"
         log = str(turn) + " " + self.__player+":"+piece+":"+move+"\n"
         previous = self.getPreviousMove()
-
+        
         if previous:#in middle of game
             f = open(file,"a")
             f.write(previous)
