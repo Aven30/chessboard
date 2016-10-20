@@ -31,14 +31,15 @@ class FileHandler:
     1. Method does not check for file existance
     2. Method does not check if string is in proper format
     '''
-    def write(self,turn,piece,move):
+    def write(self,turn,piece,move,timeExpired):
         file = "log_"+self.__player+".txt"
         log = str(turn) + " " + self.__player+":"+piece+":"+move+"\n"
         previous = self.getPreviousMove()
 
         if previous:#in middle of game
             f = open(file,"a")
-            f.write(previous)
+            if (not timeExpired):
+                f.write(previous)
             f.write(log)
             f.close()
         else: #if opponent file is empty, start of new game
@@ -75,7 +76,7 @@ class FileHandler:
         file = "log_"+self.__opponent+".txt"
         f = open(file,"r")
         last = None
-        for line in f:
+        for line in f:    
             last = line
         f.close()
         return last
