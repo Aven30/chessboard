@@ -41,7 +41,7 @@ def f(board):
 	rookLocation = board.pieces(chess.ROOK,True)
 	 
 	if(len(rookLocation) == 0):
-		value = value - 80  # -60 if ROOK no longer there, 
+		value = value - 80  # -80 if ROOK no longer there, 
 	else:
 		for s in rookLocation:
 			rookLocation = s
