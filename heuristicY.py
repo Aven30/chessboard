@@ -1,5 +1,43 @@
-import chess
-totalMoves = 0
+import chess 
+######################################################################
+# Strategy :
+# --------------------------------------------------------------------
+# The board value starts at 500. We want to MAXIMIZE the points and 
+# that would determine our next move. We start at 500 instead of 0
+# (like we did in the heuristic x) because we don't want to move too 
+# much. The idea is to delay the game since we only have two pieces.
+# So as long as nothing is wrong, we are fine. We are not trying to
+# attack. (But we may find ourselves doing so at times)
+# 
+# -------------------
+# In Check?
+# -------------------
+# A lot of points (200) are taken off if our current board is in check.
+# -------------------
+# Positions
+# -------------------
+# The closer we are to Player X's rows, the more points we take off. 
+# We take more points off for our King getting closer to them.
+# We want to discourage both our Knight and King to move any closer to
+# Player X. We also encourage the column to be more towards our left
+# so we take points off the more they get close to the right (with
+# also taking more points off from the King). The reason is because
+# Player X starts in positions more towards the right so we would like
+# to kind of stay in the left corner to delay the game as much as 
+# possible!
+# ------------------
+# Attacking
+# ------------------
+# We check for those attacking us. The more player are in attack
+# mode towards our king, the more points taken off. The same goes
+# for knight, except that we don't take as many points off for the
+# knight since it's not as important as the king.
+#
+# In conclusion, We add a lot of points to real key moves (such as 
+# killing their pieces and being in attack mode) and discourage
+# our king to move forward while encouraging the Knight and Rook to
+# move forward towards the other play.
+######################################################################
 def h(board):
 	return f(board)+g(board)
 def g(board):
@@ -15,78 +53,68 @@ def f(board):
 		value = value-100
 		#print("in check, -100"+str(value))
 	#####################################
-	# R O O K  
+	# K I N G
 	####################################
-	# Is ROOK still there?
-	rookLocation = board.pieces(chess.ROOK,False)
-	# -60 if ROOK no longer there
-	 
-	if(len(rookLocation) == 0):
-		value = value - 60
-		#print("rook gone!, -60"+str(value))
-	else:
+	# Is king still there?
+	kingLocation = board.pieces(chess.KING,False)
+	if(len(kingLocation) == 0):
+		value = value - 500
+    else:
 		# There will only be one piece
-		for s in rookLocation:
-			rookLocation = s
+		for s in kingLocation:
+			kingLocation = s
 
-		# ROOK ATTACKERS :(
-		attackers = board.attackers(True,rookLocation)
-		#print(str(len(attackers))+" number of rook attackers!")
-		#print("Location: "+str(rookLocation))
+		# king ATTACKERS :(
+		attackers = board.attackers(True,kingLocation)
+		#print(str(len(attackers))+" number of king attackers!")
+		#print("Location: "+str(kingLocation))
 
-		
 		# One attacker
 		if(len(attackers) == 1):
-			value = value-10
-			#print("Rook: one attacker, -10"+str(value))
+			value = value-60
 		# Two attackers
 		elif(len(attackers) == 2):
-			value = value-20
-			#print("Rook: two attacker, -20"+str(value))
+			value = value-80
 		# at least Three attackers
 		elif(len(attackers)>0):
-			value = value-30
-			#print("Rook: three attackers, -30"+str(value))
+			value = value-100
 		# Now, let's deal with location. We need to stall
 		# So further away from the player, the better. Also,
 		# The sides are better.
 		# COLUMN
-		rookLocation = chess.SQUARE_NAMES[rookLocation]
-		currentCol =  rookLocation[0:1]
-		if (currentCol == "c"):
-			value = value-2			
-			#print("Rook: column c, -2"+str(value))
-		elif(currentCol == "d"):
-			value = value-6
-			#print("Rook: column d, -6"+str(value))
+		kingLocation = chess.SQUARE_NAMES[kingLocation]
+		currentCol =  kingLocation[0:1]
+	 
+		if (currentCol == "d"):
+			value = value-30			
+			#print("king: column c, -2"+str(value))
 		elif(currentCol == "e"):
-			value = value-2
-			#print("Rook: column e, -2"+str(value))
+			value = value-40
+			#print("king: column d, -6"+str(value))
+		elif(currentCol == "f"):
+			value = value-60
+		elif(currentCol == "g"):
+			value = value-80
+			#print("king: column e, -2"+str(value))
 		# ROW
-		row = rookLocation[1:2]
-		if (row == 4):
-			value = value-10
-			#print("Rook: row 4, -10"+str(value))
-		elif(row == 5):
-			value = value-15
-			#print("Rook: row 5, -15"+str(value))
-		elif(row == 6):
-			value = value-25
-			#print("Rook: row 6, -25"+str(value))
-		elif(row == 7):
-			value = value-35
-			#print("Rook: row 6, -35"+str(value))
-		elif(row == 8):
-			value = value-45
-			#print("Rook: row 8, -45"+str(value))
+		row = kingLocation[1:2]
+		row = int(row)	
+		if (row is 6 or row is 7):
+			value = value-200
+		elif(row is 5):
+			value = value-250
+		elif(row is 4):
+			value = value-225
+		elif (row is 3):
+			value = value-250
 	#####################################
 	# K N I G H T
 	####################################
-	# Is ROOK still there?
+	# Is king still there?
 	knightLocation = board.pieces(chess.KNIGHT,False)
 	# -50 if knight no longer there
 	if(len(knightLocation) == 0):
-		value = value - 50
+		value = value - 150
 		#print("Knight gone, -50"+str(value))
 	else:
 		# There will only be one piece
@@ -113,31 +141,28 @@ def f(board):
 		knightLocation = chess.SQUARE_NAMES[knightLocation]
 		# COLUMN
 		currentCol =  knightLocation[0:1]
-		if (currentCol == "c"):
-			value = value-2
-			#print("Knight: col c, -2"+str(value))
-		elif(currentCol == "d"):
-			value = value-6
-			#print("Knight: col d, -6"+str(value))
+		if (currentCol == "d"):
+			value = value-30			
+			#print("king: column c, -2"+str(value))
 		elif(currentCol == "e"):
-			value = value-2
-			#print("Knight: col e, -2"+str(value))
+			value = value-40
+			#print("king: column d, -6"+str(value))
+		elif(currentCol == "f"):
+			value = value-60
+		elif(currentCol == "g"):
+			value = value-80
 		# ROW
 		row = knightLocation[1:2]
-		if (row == 4):
-			value = value-10
-			#print("Knight: row 4, -10"+str(value))
-		elif(row == 5):
-			value = value-15
-			#print("Knight: row 5, -15"+str(value))
+		row = int(row)
+		if(row == 7):
+			value = value-15 
 		elif(row == 6):
-			value = value-25
-			#print("Knight: row 6, -25"+str(value))
-		elif(row == 7):
-			value = value-35
-			#print("Knight: row 7, -35"+str(value))
-		elif(row == 8):
-			value = value-45
-			#print("Knight: row 8, -45"+str(value))
+			value = value-50
+		elif(row == 5):
+			value = value-100
+		elif(row == 4):
+			value = value-125
+		elif (row == 3):
+			value = value-150
 	return value
 	
